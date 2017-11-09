@@ -669,6 +669,18 @@
 			this._video = getNode(video);
 			this._video.play();
 
+			if (this._options.end === 'rewind') {
+				this._video.addEventListener('ended', function () {
+					self._video.currentTime = 0;
+					self._seeThru.getCanvas().addEventListener('click', playSelfAndUnbind);
+				});
+			} else if (this._options.end !== 'stop') {
+				this._video.addEventListener('ended', function () {
+					self._video.currentTime = 0;
+					self._video.play();
+				});
+			}
+
 			// update transparent video
 			this._seeThru.updateVideo(this._video);
 
