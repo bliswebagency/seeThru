@@ -230,7 +230,7 @@
 	* @param {Object options}
 	*/
 	function TransparentVideo (video, options) {
-
+		var video = video;
 		var initialStyles = {};
 		var divisor = options.mask ? 1 : 2; //static alpha data will not cut the image dimensions
 		var dimensions = { // calculate dimensions
@@ -246,6 +246,7 @@
 		var requestAnimationFrame = window.requestAnimationFrame || getRequestAnimationFrame();
 		var cancelAnimationFrame = window.cancelAnimationFrame || getCancelAnimationFrame();
 		var lastDrawnFrameTime = null;
+
 		var drawFrame = function (recurse) {
 			var image, alphaData, i, len, currentFrameTime = video.currentTime;
 
@@ -342,6 +343,18 @@
 			drawStaticMask(node);
 			return this;
 		};
+
+		/**
+		* @method updateVideo
+		* change the video being used 
+		* @param {DOMElement} node
+		* @returns self
+		* @API public
+		*/
+		this.updateVideo = function (node) {
+			video = node
+			return this;
+		}
 
 		/**
 		* @method getCanvas
@@ -639,6 +652,29 @@
 			this._seeThru.updateMask(getNode(mask));
 			return this;
 		};
+		
+    /**
+		* @method updateVideo
+		* @param {String|DOMElement|DOMCollection} video
+		* swaps the video currently used
+		* @returns self
+		* @API public
+		*/
+		this.updateVideo = function (video) {
+			// get rid of the old video
+			this._video.pause(); // save some cpu
+			elementStore.remove(this._video);
+			
+			// update config to new video
+			this._video = getNode(video);
+			this._video.play();
+
+			// update transparent video
+			this._seeThru.updateVideo(this._video);
+
+			elementStore.remove(this._video);
+			return this;
+    }
 
 		/**
 		* @method ready
